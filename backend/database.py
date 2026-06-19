@@ -1,7 +1,8 @@
 import duckdb
 
+from db_config import DB_PATH
 def get_connection():
-    return duckdb.connect("atlas.db")
+    return duckdb.connect(str(DB_PATH))
 
 
 def initialize_database():

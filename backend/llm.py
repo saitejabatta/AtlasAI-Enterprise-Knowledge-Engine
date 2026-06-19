@@ -1,4 +1,6 @@
 import os
+import re
+import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -8,6 +10,7 @@ client = OpenAI(
     api_key=os.getenv("FEATHERLESS_API_KEY"),
     base_url="https://api.featherless.ai/v1"
 )
+
 
 def ask_llm(prompt):
 
@@ -22,4 +25,14 @@ def ask_llm(prompt):
         temperature=0
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+
+    # Remove <think> blocks
+    content = re.sub(
+        r"<think>.*?</think>",
+        "",
+        content,
+        flags=re.DOTALL
+    )
+
+    return content.strip()

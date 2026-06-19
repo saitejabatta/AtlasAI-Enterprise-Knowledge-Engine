@@ -1,8 +1,9 @@
 import duckdb
 
+from db_config import DB_PATH
 def extract_metadata():
 
-    conn = duckdb.connect("atlas.db")
+    conn = duckdb.connect(str(DB_PATH))
 
     tables = conn.execute(
         "SHOW TABLES"

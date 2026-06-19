@@ -2,7 +2,9 @@ import duckdb
 
 def execute_query(sql):
 
-    conn = duckdb.connect("atlas.db")
+    from db_config import DB_PATH
+
+    conn = duckdb.connect(str(DB_PATH))
 
     result = conn.execute(sql).fetchdf()
 
