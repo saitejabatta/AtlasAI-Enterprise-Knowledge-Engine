@@ -1,0 +1,34 @@
+{
+    "claims": {
+        "description": "claims table",
+        "columns": [
+            "claim_id",
+            "patient_id",
+            "provider_id",
+            "claim_amount"
+        ]
+    },
+    "patients": {
+        "description": "patients table",
+        "columns": [
+            "patient_id",
+            "diagnosis",
+            "state"
+        ]
+    },
+    "payments": {
+        "description": "payments table",
+        "columns": [
+            "payment_id",
+            "claim_id",
+            "payment_amount"
+        ]
+    },
+    "providers": {
+        "description": "providers table",
+        "columns": [
+            "provider_id",
+            "provider_name"
+        ]
+    }
+}
