@@ -2,5 +2,11 @@ duckdb
 pandas
 fastapi
 uvicorn
+cryptography
 openai
+google-genai
 python-dotenv
+python-multipart
+SQLAlchemy
+psycopg[binary]
+pymysql

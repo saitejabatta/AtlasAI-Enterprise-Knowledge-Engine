@@ -1,51 +1,44 @@
-from llm import ask_llm
-import re
-
-
 def generate_answer(
     question,
     result_df
 ):
+    """Create a concise answer using only values present in query results.
 
-    prompt = f"""
-You are AtlasAI, an enterprise data analyst.
+    Natural language generation can add plausible but unsupported
+    interpretations. Keep this user-facing summary deterministic until an
+    answer-generation path can verify every claim against the result set.
+    """
+    if result_df is None or result_df.empty:
+        return "## Key Findings\nNo rows matched the question."
 
-Question:
-{question}
+    if len(result_df.index) == 1 and len(result_df.columns) == 1:
+        value = result_df.iloc[0, 0]
+        return (
+            "## Key Findings\n"
+            f"The result for “{question.strip()}” is **{value}**.\n\n"
+            "## Summary\n"
+            "This answer reflects the returned query result."
+        )
 
-Query Results:
-{result_df.to_string()}
-
-Instructions:
-
-1. Explain results in executive-friendly language.
-2. Be concise.
-3. Focus on business impact.
-4. Do not mention SQL.
-5. Do not mention retrieval.
-6. Do not show internal reasoning.
-7. Use this format:
-
-## Key Findings
-...
-
-## Summary
-...
-
-## Recommendation
-...
-"""
-
-    answer = ask_llm(prompt)
-
-    # Remove thinking blocks
-    answer = re.sub(
-        r"<think>.*?</think>",
-        "",
-        answer,
-        flags=re.DOTALL
+    # Render the actual returned rows; do not infer causes, trends, or
+    # recommendations that are absent from the data.
+    columns = [str(column) for column in result_df.columns]
+    rows = [
+        [
+            str(value).replace("|", "\\|").replace("\n", " ")
+            for value in row
+        ]
+        for row in result_df.itertuples(index=False, name=None)
+    ]
+    table = "| " + " | ".join(columns) + " |\n"
+    table += "| " + " | ".join("---" for _ in columns) + " |\n"
+    table += "\n".join(
+        "| " + " | ".join(row) + " |"
+        for row in rows
     )
-
-    answer = answer.strip()
-
-    return answer
+    return (
+        "## Key Findings\n"
+        f"Results for “{question.strip()}”:\n\n"
+        f"{table}\n\n"
+        f"## Summary\n{len(result_df.index)} row(s) returned."
+    )

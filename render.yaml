@@ -1,0 +1,56 @@
+services:
+  - type: web
+    name: atlasai-api
+    runtime: python
+    plan: starter
+    region: ohio
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: atlasai-data
+      mountPath: /var/data
+      sizeGB: 5
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: ATLAS_ENV
+        value: production
+      - key: ATLAS_DATA_DIR
+        value: /var/data
+      - key: ATLAS_DEMO_SEED
+        value: "false"
+      - key: ATLAS_COOKIE_SECURE
+        value: "true"
+      - key: ATLAS_SESSION_TTL_SECONDS
+        value: "604800"
+      - key: ATLAS_MAX_CSV_UPLOAD_BYTES
+        value: "262144000"
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ATLAS_SESSION_SECRET
+        generateValue: true
+      - key: ATLAS_SECRET_KEY
+        generateValue: true
+      - key: ATLAS_ALLOWED_ORIGINS
+        sync: false
+      - key: ATLAS_DATABASE_HOST_ALLOWLIST
+        sync: false
+
+  - type: web
+    name: atlasai-frontend
+    runtime: node
+    plan: starter
+    region: ohio
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: VITE_API_BASE_URL
+        sync: false

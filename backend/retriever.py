@@ -1,3 +1,7 @@
+from metadata import extract_metadata
+from relationships import get_relationships
+
+
 TABLE_KEYWORDS = {
     "patients": [
         "patient",
@@ -31,9 +35,17 @@ TABLE_KEYWORDS = {
 }
 
 
+def normalize_token(value):
+    return (
+        value
+        .lower()
+        .replace("_", " ")
+    )
+
+
 def retrieve_tables(question):
 
-    question = question.lower()
+    normalized_question = question.lower()
 
     relevant_tables = set()
 
@@ -41,13 +53,32 @@ def retrieve_tables(question):
 
         for keyword in keywords:
 
-            if keyword in question:
+            if keyword in normalized_question:
                 relevant_tables.add(table)
 
-    return list(relevant_tables)
+    if relevant_tables:
+        return sorted(relevant_tables)
 
+    metadata = extract_metadata()
 
-from relationships import get_relationships
+    for table, columns in metadata.items():
+        table_token = normalize_token(table)
+
+        if table_token in normalized_question:
+            relevant_tables.add(table)
+            continue
+
+        for column in columns:
+            column_token = normalize_token(column[0])
+
+            if column_token in normalized_question:
+                relevant_tables.add(table)
+                break
+
+    if relevant_tables:
+        return sorted(relevant_tables)
+
+    return sorted(metadata.keys())
 
 
 def retrieve_relationships(retrieved_tables):

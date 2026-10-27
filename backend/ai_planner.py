@@ -35,8 +35,8 @@ IMPORTANT RULES:
 2. Use ONLY columns from Database Schema.
 3. Never invent tables.
 4. Never invent columns.
-5. If the user says diabetic, use:
-   diagnosis = 'Diabetes'
+5. Map business concepts to the closest schema column when obvious.
+   Example: disease or condition terms can use diagnosis when that column exists.
 6. Return ONLY valid JSON.
 7. No markdown.
 8. No explanations outside JSON.
@@ -173,6 +173,11 @@ Return JSON only.
 
         start = response.find("{")
         end = response.rfind("}") + 1
+
+        if start == -1 or end == 0:
+            raise ValueError(
+                "Planner did not return a JSON object"
+            )
 
         clean_json = response[start:end]
 

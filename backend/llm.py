@@ -1,38 +1,62 @@
 import os
 import re
-import json
+
+from google import genai
 from dotenv import load_dotenv
-from openai import OpenAI
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("FEATHERLESS_API_KEY"),
-    base_url="https://api.featherless.ai/v1"
+API_KEY = (
+    os.getenv("GEMINI_API_KEY")
+    or os.getenv("GOOGLE_API_KEY")
+)
+MODEL_NAME = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-2.5-flash"
+)
+
+if not API_KEY:
+    raise ValueError(
+        "GEMINI_API_KEY or GOOGLE_API_KEY not found in .env"
+    )
+
+client = genai.Client(
+    api_key=API_KEY
 )
 
 
-def ask_llm(prompt):
+def ask_llm(prompt: str) -> str:
+    """
+    Sends a prompt to Gemini and returns clean text.
+    """
 
-    response = client.chat.completions.create(
-        model="Qwen/Qwen3-32B",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        temperature=0
-    )
+    try:
 
-    content = response.choices[0].message.content
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
+        )
 
-    # Remove <think> blocks
-    content = re.sub(
-        r"<think>.*?</think>",
-        "",
-        content,
-        flags=re.DOTALL
-    )
+        text = response.text or ""
 
-    return content.strip()
+        # Remove markdown code fences if Gemini returns them
+        text = re.sub(
+            r"```json",
+            "",
+            text,
+            flags=re.IGNORECASE
+        )
+
+        text = re.sub(
+            r"```",
+            "",
+            text
+        )
+
+        return text.strip()
+
+    except Exception as e:
+
+        raise RuntimeError(
+            f"Gemini API Error: {e}"
+        )

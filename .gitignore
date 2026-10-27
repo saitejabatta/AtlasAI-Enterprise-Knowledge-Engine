@@ -20,6 +20,14 @@ node_modules/
 
 # Logs
 *.log
+backend/audit_log.jsonl
+backend/data_sources.json
+backend/uploads/
+backend/.atlas_secret
+backend/metadata_overrides.json
+backend/auth.db
+backend/workspaces/
 
 # Test files
 test_*.py
+!tests/unit/test_*.py

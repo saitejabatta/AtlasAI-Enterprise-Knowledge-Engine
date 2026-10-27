@@ -1,3 +1,8 @@
+import duckdb
+
+from db_config import get_db_path
+
+
 RELATIONSHIPS = [
     {
         "from_table": "patients",
@@ -19,5 +24,24 @@ RELATIONSHIPS = [
     }
 ]
 
+
 def get_relationships():
-    return RELATIONSHIPS
+    from data_sources import read_sources
+
+    connection = duckdb.connect(str(get_db_path()))
+    try:
+        available_tables = {
+            row[0]
+            for row in connection.execute("SHOW TABLES").fetchall()
+        }
+    finally:
+        connection.close()
+    relationships = [
+        relationship
+        for relationship in RELATIONSHIPS
+        if relationship["from_table"] in available_tables
+        and relationship["to_table"] in available_tables
+    ]
+    for source in read_sources():
+        relationships.extend(source.get("relationships", []))
+    return relationships

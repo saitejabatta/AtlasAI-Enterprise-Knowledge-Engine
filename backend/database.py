@@ -1,8 +1,8 @@
 import duckdb
 
-from db_config import DB_PATH
+from db_config import get_db_path
 def get_connection():
-    return duckdb.connect(str(DB_PATH))
+    return duckdb.connect(str(get_db_path()))
 
 
 def initialize_database():
