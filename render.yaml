@@ -47,7 +47,7 @@ services:
     plan: free
     region: ohio
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm install --no-audit --no-fund && npm run build
     startCommand: npm run start
     healthCheckPath: /
     envVars:
