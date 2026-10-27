@@ -26,9 +26,12 @@ def _create_workspace_database(path: Path) -> None:
 
     try:
         demo_enabled = (
-            os.getenv("ATLAS_ENV", "development").lower() != "production"
-            and os.getenv("ATLAS_DEMO_SEED", "true").lower()
-            in {"1", "true", "yes"}
+            os.getenv("ATLAS_DEMO_SEED", "true").lower() in {"1", "true", "yes"}
+            and (
+                os.getenv("ATLAS_ENV", "development").lower() != "production"
+                or os.getenv("ATLAS_DEMO_MODE", "false").lower()
+                in {"1", "true", "yes"}
+            )
         )
         if demo_enabled:
             for table in CORE_TABLES:

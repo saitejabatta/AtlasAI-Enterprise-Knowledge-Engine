@@ -102,6 +102,12 @@ app = FastAPI(
     version="2.0.0"
 )
 
+
+def is_public_demo_mode():
+    return os.getenv("ATLAS_DEMO_MODE", "false").strip().lower() in {
+        "1", "true", "yes"
+    }
+
 # CORS wraps authentication so rejected API requests still receive CORS headers.
 app.add_middleware(
     WorkspaceAuthMiddleware
@@ -366,6 +372,15 @@ async def upload_data_source(
     file: UploadFile = File(...)
 ):
 
+    if is_public_demo_mode():
+        return JSONResponse(
+            {
+                "success": False,
+                "error": "This public preview uses synthetic sample data only. Uploads are disabled.",
+            },
+            status_code=403,
+        )
+
     try:
         source = await ingest_csv(file)
 
@@ -399,6 +414,15 @@ async def upload_data_source(
 def connect_database_source(
     request: DatabaseConnectionRequest
 ):
+
+    if is_public_demo_mode():
+        return JSONResponse(
+            {
+                "success": False,
+                "error": "This public preview uses synthetic sample data only. External database connections are disabled.",
+            },
+            status_code=403,
+        )
 
     try:
         source = connect_database(

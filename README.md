@@ -135,17 +135,17 @@ Run the repeatable backend unit checks without calling Gemini:
 
 If port `3000` is busy, Vite will use the next available port.
 
-## Deploy to Render
+## Deploy a free public preview to Render
 
-The root `render.yaml` defines an API web service and a Node SSR web service. The API mounts `/var/data` as its persistent storage directory; set `ATLAS_DATA_DIR` to this path so workspace DuckDB files, uploads, auth sessions, audit logs, and encryption material survive deploys. The frontend uses the generated Nitro Node server rather than serving only the client bundle.
+The root `render.yaml` defines free API and Node SSR services. This is a disposable, synthetic-data-only preview: Render's free services have ephemeral filesystems and may sleep while idle. Accounts, sessions, audit records, and workspace state can be lost after a restart, redeploy, or spin-down. CSV uploads and external database connections are disabled in demo mode. Do not use this deployment with real customer, confidential, or regulated data. The frontend uses the generated Nitro Node server rather than serving only the client bundle.
 
 1. Push the root repository and frontend submodule commits to GitHub, making sure the root repository includes `.gitmodules` and points at the frontend commit containing the current UI.
 2. In Render, connect the root GitHub repository and create a Blueprint from `render.yaml`.
-3. Enter `GEMINI_API_KEY`, `ATLAS_ALLOWED_ORIGINS` (the exact HTTPS frontend URL), `ATLAS_DATABASE_HOST_ALLOWLIST` (comma-separated exact database hostnames; leave empty only if no external database will be connected yet), and `VITE_API_BASE_URL` (the full HTTPS API URL) when prompted.
+3. Enter `GEMINI_API_KEY` when prompted. Leave `ATLAS_DATABASE_HOST_ALLOWLIST` blank for the public preview; the demo blocks external database connections. The frontend and backend HTTPS URLs are wired automatically by the Blueprint.
 4. Keep the generated `ATLAS_SESSION_SECRET` and `ATLAS_SECRET_KEY` private. Do not commit them or put them in client-side `VITE_*` variables.
-5. After deployment, verify `/health`, register a disposable account, connect a non-production source, run a query, and confirm data persists after a redeploy before inviting real users.
+5. After deployment, verify `/health`, create a disposable account, and run queries against the seeded synthetic healthcare dataset. Free services can take about a minute to wake after idle time.
 
-The Blueprint uses a paid web-service plan and a persistent disk. It is a single-instance pilot deployment: account/session state and rate limits still use local SQLite, and workspace data is file-backed. Add managed identity, database/object storage, backups, shared rate limiting, monitoring, and a security review before using it for sensitive or business-critical data. Review the hosting provider's current pricing and retention/back-up settings before creating resources.
+This preview intentionally has no durable application storage. To graduate it to a real product, first migrate auth, rate limits, workspace metadata, and audit events to managed Postgres; uploaded objects to private object storage; and add backups, monitoring, and a security review. Never connect real databases or upload real records to the preview.
 
 ## Connect your own data
 
