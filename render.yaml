@@ -46,9 +46,8 @@ services:
     runtime: node
     plan: free
     region: ohio
-    rootDir: frontend
-    buildCommand: npm install --no-audit --no-fund && npm run build
-    startCommand: npm run start
+    buildCommand: git submodule update --init frontend && cd frontend && npm install --no-audit --no-fund && npm run build
+    startCommand: cd frontend && npm run start
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
