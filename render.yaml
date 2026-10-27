@@ -39,7 +39,7 @@ services:
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: ATLAS_DATABASE_HOST_ALLOWLIST
-        sync: false
+        value: preview-disabled.invalid
 
   - type: web
     name: atlasai-frontend

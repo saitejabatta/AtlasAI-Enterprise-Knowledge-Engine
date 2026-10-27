@@ -141,7 +141,7 @@ The root `render.yaml` defines free API and Node SSR services. This is a disposa
 
 1. Push the root repository and frontend submodule commits to GitHub, making sure the root repository includes `.gitmodules` and points at the frontend commit containing the current UI.
 2. In Render, connect the root GitHub repository and create a Blueprint from `render.yaml`.
-3. Enter `GEMINI_API_KEY` when prompted. Leave `ATLAS_DATABASE_HOST_ALLOWLIST` blank for the public preview; the demo blocks external database connections. The frontend and backend HTTPS URLs are wired automatically by the Blueprint.
+3. Enter `GEMINI_API_KEY` when prompted. External database connections are disabled by the demo mode and a closed database-host allowlist. The frontend and backend HTTPS URLs are wired automatically by the Blueprint.
 4. Keep the generated `ATLAS_SESSION_SECRET` and `ATLAS_SECRET_KEY` private. Do not commit them or put them in client-side `VITE_*` variables.
 5. After deployment, verify `/health`, create a disposable account, and run queries against the seeded synthetic healthcare dataset. Free services can take about a minute to wake after idle time.
 
